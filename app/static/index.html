@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Link Player</title><link rel="stylesheet" href="/static/style.css">
+</head>
+<body><main class="shell">
+<header><div class="logo">▶</div><div><h1>Link Player</h1><p>Play authorized direct video links online</p></div></header>
+<section class="form-card">
+<label for="mediaUrl">Direct HTTPS video URL</label>
+<input id="mediaUrl" type="url" placeholder="https://example.com/video.mp4" autocomplete="url">
+<button id="openPlayer">Open Player</button>
+<p class="note">Supports direct MP4/video URLs and direct .m3u8 HLS URLs. A TeraBox share page is not the same as a direct stream URL.</p>
+<div id="error" role="status"></div>
+</section>
+<footer>No video is uploaded to this server. The browser requests media from its source host.</footer>
+</main>
+<script>
+const input=document.getElementById('mediaUrl'), button=document.getElementById('openPlayer'), error=document.getElementById('error');
+button.addEventListener('click',()=>{
+  error.textContent='';
+  let u;
+  try { u=new URL(input.value.trim()); } catch { error.textContent='Enter a valid URL.'; return; }
+  if(u.protocol!=='https:'){error.textContent='Only HTTPS links are accepted.';return;}
+  const host=u.hostname.toLowerCase();
+  if(host.includes('terabox')){error.textContent='TeraBox share-link resolution is not configured in this build. No fake stream link will be created.';return;}
+  if(!/\.(mp4|m4v|webm|mov|m3u8)$/i.test(u.pathname)){error.textContent='Could not identify a direct media URL. Use a direct MP4/video or .m3u8 link.';return;}
+  location.href='/player?url='+encodeURIComponent(u.href);
+});
+</script></body></html>
